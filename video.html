@@ -1,0 +1,19 @@
+<!-- https://your-domain.com/player.html?v=VIDEO_ID -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; }
+    iframe { width: 100vw; height: 100vh; border: none; }
+  </style>
+</head>
+<body>
+  <iframe id="player" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  <script>
+    const videoId = new URLSearchParams(location.search).get('v');
+    document.getElementById('player').src =
+      `https://www.youtube.com/embed/${videoId}?rel=0&playsinline=1`;
+  </script>
+</body>
+</html>
