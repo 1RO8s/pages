@@ -1,19 +1,55 @@
-<!-- https://your-domain.com/player.html?v=VIDEO_ID -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    * { margin: 0; padding: 0; }
-    iframe { width: 100vw; height: 100vh; border: none; }
-  </style>
-</head>
-<body>
-  <iframe id="player" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-  <script>
-    const videoId = new URLSearchParams(location.search).get('v');
-    document.getElementById('player').src =
-      `https://www.youtube.com/embed/${videoId}?rel=0&playsinline=1`;
-  </script>
-</body>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>YouTube Player</title>
+    <style>
+      html,
+      body,
+      #player {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #000;
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="player"></div>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const videoId = params.get('v');
+
+      if (/^[a-zA-Z0-9_-]{6,}$/.test(videoId || '')) {
+        const embedParams = new URLSearchParams({
+          playsinline: '1',
+          rel: '0',
+          modestbranding: '1',
+          enablejsapi: '1',
+          origin: window.location.origin,
+        });
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${embedParams.toString()}`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'origin-when-cross-origin';
+        iframe.sandbox = 'allow-scripts allow-same-origin allow-presentation';
+        document.getElementById('player').appendChild(iframe);
+      }
+    </script>
+  </body>
 </html>
