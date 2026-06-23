@@ -30,10 +30,21 @@
   </head>
   <body>
     <div id="player"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
       const params = new URLSearchParams(window.location.search);
       const videoId = params.get('v');
       const shouldAutoplay = params.get('autoplay') === '1';
+      let player = null;
+      let hasReportedPlaying = false;
+
+      function postToApp(payload) {
+        const message = JSON.stringify(payload);
+        if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === 'function') {
+          window.ReactNativeWebView.postMessage(message);
+        }
+        window.parent?.postMessage(message, '*');
+      }
 
       if (/^[a-zA-Z0-9_-]{6,}$/.test(videoId || '')) {
         const embedParams = new URLSearchParams({
@@ -57,8 +68,32 @@
         iframe.allowFullscreen = false;
         iframe.referrerPolicy = 'origin-when-cross-origin';
         iframe.sandbox = 'allow-scripts allow-same-origin allow-presentation';
+        iframe.id = 'youtube-player';
         document.getElementById('player').appendChild(iframe);
       }
+
+      window.onYouTubeIframeAPIReady = function () {
+        if (!document.getElementById('youtube-player')) {
+          return;
+        }
+
+        player = new YT.Player('youtube-player', {
+          events: {
+            onStateChange(event) {
+              if (event.data === YT.PlayerState.PLAYING && !hasReportedPlaying) {
+                hasReportedPlaying = true;
+                postToApp({
+                  type: 'youtube_playback',
+                  event: 'playing',
+                  videoId,
+                  currentTime: typeof player?.getCurrentTime === 'function' ? player.getCurrentTime() : 0,
+                  occurredAt: new Date().toISOString(),
+                });
+              }
+            },
+          },
+        });
+      };
     </script>
   </body>
 </html>
