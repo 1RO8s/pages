@@ -34,7 +34,6 @@
     <script>
       const params = new URLSearchParams(window.location.search);
       const videoId = params.get('v');
-      const shouldAutoplay = params.get('autoplay') === '1';
       let player = null;
       let hasReportedPlaying = false;
 
@@ -51,20 +50,16 @@
           playsinline: '1',
           rel: '0',
           modestbranding: '1',
-          controls: '0',
+          controls: '1',
           disablekb: '1',
           fs: '0',
           iv_load_policy: '3',
           enablejsapi: '1',
           origin: window.location.origin,
         });
-        if (shouldAutoplay) {
-          embedParams.set('autoplay', '1');
-          embedParams.set('mute', '1');
-        }
         const iframe = document.createElement('iframe');
         iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${embedParams.toString()}`;
-        iframe.allow = 'autoplay; encrypted-media';
+        iframe.allow = 'encrypted-media';
         iframe.allowFullscreen = false;
         iframe.referrerPolicy = 'origin-when-cross-origin';
         iframe.sandbox = 'allow-scripts allow-same-origin allow-presentation';
